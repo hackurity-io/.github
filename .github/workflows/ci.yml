@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, prod, dev]
+
+jobs:
+  branch-name-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-pass for prod merges
+        if: github.base_ref == 'prod'
+        run: echo "Branch name check not applicable for dev→prod merges"
+      - name: Check branch name
+        if: github.base_ref != 'prod'
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          PATTERN='^(feat|fix|chore|docs|refactor|test|ci|build|perf|style|revert)(\/[a-z0-9._-]+)+$'
+          if [[ ! "$BRANCH" =~ $PATTERN ]]; then
+            echo "::error::Branch name '$BRANCH' does not match pattern: $PATTERN"
+            echo ""
+            echo "Expected format: <type>/<description>"
+            echo "  Types: feat, fix, chore, docs, refactor, test, ci, build, perf, style, revert"
+            echo "  Example: feat/add-vpc-peering"
+            exit 1
+          fi
+          echo "Branch name '$BRANCH' is valid."
+
+  pr-title-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          PATTERN='^(feat|fix|chore|docs|refactor|test|ci|build|perf|style|revert)(\(.+\))?\!?:'
+          if [[ ! "$TITLE" =~ $PATTERN ]]; then
+            echo "::error::PR title does not follow conventional commits format."
+            echo ""
+            echo "Expected format: <type>[(<scope>)][!]: <description>"
+            echo "  Types: feat, fix, chore, docs, refactor, test, ci, build, perf, style, revert"
+            echo "  Example: feat(networking): add VPC peering"
+            exit 1
+          fi
+          echo "PR title is valid."
+
+  ticket-reference-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-pass for dev PRs
+        if: github.base_ref == 'dev'
+        run: echo "Ticket reference check not required for dev PRs"
+      - name: Check for ticket reference
+        if: github.base_ref != 'dev'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if [ -z "$PR_BODY" ]; then
+            echo "::error::PR description is empty."
+            echo ""
+            echo "Every PR must include a ticket reference in the description."
+            echo "Expected: Monday Ticket: https://hackurity.monday.com/boards/..."
+            echo "      or: Monday Ticket: #1234567890"
+            exit 1
+          fi
+
+          if echo "$PR_BODY" | grep -qiP 'https://hackurity\.monday\.com/boards/\d+'; then
+            echo "Ticket reference found (board URL)."
+            exit 0
+          fi
+
+          if echo "$PR_BODY" | grep -qiP 'monday(\s*ticket)?\s*:\s*#\d+'; then
+            echo "Ticket reference found (item ID)."
+            exit 0
+          fi
+
+          echo "::error::No ticket reference found in PR description."
+          echo ""
+          echo "Every PR must include a ticket reference in the description."
+          echo "Valid formats:"
+          echo "  Monday Ticket: https://hackurity.monday.com/boards/1234567890/pulses/1234567890"
+          echo "  Monday Ticket: #1234567890"
+          echo "  Monday: #1234567890"
+          exit 1
