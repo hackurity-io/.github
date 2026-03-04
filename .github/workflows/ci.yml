@@ -51,35 +51,40 @@ jobs:
       - name: Auto-pass for dev PRs
         if: github.base_ref == 'dev'
         run: echo "Ticket reference check not required for dev PRs"
-      - name: Check for ticket reference
+      - name: Check for issue reference
         if: github.base_ref != 'dev'
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           if [ -z "$PR_BODY" ]; then
-            echo "::error::PR description is empty."
-            echo ""
-            echo "Every PR must include a ticket reference in the description."
-            echo "Expected: Monday Ticket: https://hackurity.monday.com/boards/..."
-            echo "      or: Monday Ticket: #1234567890"
+            echo "::error::PR description is empty. Use the PR template."
             exit 1
           fi
 
-          if echo "$PR_BODY" | grep -qiP 'https://hackurity\.monday\.com/boards/\d+'; then
-            echo "Ticket reference found (board URL)."
-            exit 0
+          # Check that the "Issue:" field from the PR template is filled in
+          # Matches "Issue: <something>" where <something> is not empty/placeholder
+          ISSUE_LINE=$(echo "$PR_BODY" | grep -iP '^issue\s*:' | head -1 || true)
+
+          if [ -z "$ISSUE_LINE" ]; then
+            echo "::error::No 'Issue:' field found in PR description."
+            echo ""
+            echo "Use the PR template and fill in the Issue Reference section."
+            echo "Example: Issue: https://hackurity.monday.com/boards/123/pulses/456"
+            echo "         Issue: HACKU-123"
+            echo "         Issue: #42"
+            exit 1
           fi
 
-          if echo "$PR_BODY" | grep -qiP 'monday(\s*ticket)?\s*:\s*#\d+'; then
-            echo "Ticket reference found (item ID)."
-            exit 0
+          # Extract the value after "Issue:"
+          ISSUE_VALUE=$(echo "$ISSUE_LINE" | sed -E 's/^[Ii]ssue\s*:\s*//')
+
+          if [ -z "$ISSUE_VALUE" ]; then
+            echo "::error::Issue reference is empty. Fill in the 'Issue:' field."
+            echo ""
+            echo "Example: Issue: https://hackurity.monday.com/boards/123/pulses/456"
+            echo "         Issue: HACKU-123"
+            echo "         Issue: #42"
+            exit 1
           fi
 
-          echo "::error::No ticket reference found in PR description."
-          echo ""
-          echo "Every PR must include a ticket reference in the description."
-          echo "Valid formats:"
-          echo "  Monday Ticket: https://hackurity.monday.com/boards/1234567890/pulses/1234567890"
-          echo "  Monday Ticket: #1234567890"
-          echo "  Monday: #1234567890"
-          exit 1
+          echo "Issue reference found: ${ISSUE_VALUE}"
