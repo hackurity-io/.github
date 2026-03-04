@@ -1,9 +1,9 @@
 ## Description
 <!-- What does this PR do? Explain the changes clearly and concisely. -->
 
-## Monday Ticket Reference
-<!-- REQUIRED: Add the Monday ticket link here. PRs without a Monday reference will be rejected. -->
-Monday Ticket: 
+## Issue Reference
+<!-- REQUIRED: Add the issue reference here (link or ID). PRs without an issue reference will be rejected. -->
+Issue:
 
 ## Type of Change
 <!-- Mark the relevant option with an [x] -->
