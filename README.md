@@ -1,3 +1,1 @@
-# .github
-
-Org-level default files (PR template, community health)
+![Hackurity](hackurity-hero-secure-by-nature.png)
