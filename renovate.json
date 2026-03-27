@@ -1,0 +1,24 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":disableDependencyDashboard"
+  ],
+  "enabledManagers": [
+    "github-actions"
+  ],
+  "packageRules": [
+    {
+      "description": "Group all third-party GitHub Actions updates into a single PR",
+      "matchManagers": ["github-actions"],
+      "excludePackagePatterns": ["^hackurity-io/"],
+      "groupName": "github-actions",
+      "commitMessageTopic": "GitHub Actions",
+      "pinDigests": true,
+      "schedule": ["before 7am on monday"]
+    }
+  ],
+  "labels": ["ci"],
+  "prConcurrentLimit": 5,
+  "branchPrefix": "renovate/"
+}
