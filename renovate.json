@@ -18,6 +18,9 @@
       "schedule": ["before 7am on monday"]
     }
   ],
+  "vulnerabilityAlerts": {
+    "enabled": false
+  },
   "labels": ["ci"],
   "prConcurrentLimit": 5,
   "branchPrefix": "renovate/"
