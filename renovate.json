@@ -23,5 +23,5 @@
   },
   "labels": ["ci"],
   "prConcurrentLimit": 5,
-  "branchPrefix": "renovate/"
+  "branchPrefix": "chore/renovate-"
 }
