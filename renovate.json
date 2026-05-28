@@ -9,9 +9,8 @@
   ],
   "packageRules": [
     {
-      "description": "Group all third-party GitHub Actions updates into a single PR",
+      "description": "Group all GitHub Actions updates (third-party and internal hackurity-io/*) into a single PR",
       "matchManagers": ["github-actions"],
-      "excludePackagePatterns": ["^hackurity-io/"],
       "groupName": "github-actions",
       "commitMessageTopic": "GitHub Actions",
       "pinDigests": true,
