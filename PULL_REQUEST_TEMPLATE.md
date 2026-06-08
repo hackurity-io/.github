@@ -13,6 +13,9 @@ Issue:
 - [ ] Documentation update
 - [ ] Refactoring
 - [ ] Performance improvement
+- [ ] Maintenance (chore, dependency bumps, version pins)
+- [ ] CI/CD
+- [ ] Test improvements
 
 ## How Has This Been Tested?
 <!-- Describe the tests you ran. Include relevant details like test configuration, edge cases covered, etc. If you skipped tests or ignored failing tests, explain why here. -->
